@@ -1,0 +1,219 @@
+<html>
+<head>
+  <title>ZJU校徽生成器</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="icon" href="favicon.png">
+<link rel="shortcut icon" href="favicon.png">
+<link rel="stylesheet" href="farbtastic/farbtastic.css" type="text/css" />
+<style type="text/css">
+body {
+  font-size: 15px;
+  font-family:DejaVu, Arial, stHeiti, Microsoft YaHei;
+  background: #777;
+}
+#mainCanvas{
+  position: fixed;
+  right: 0;
+  top: 0;
+  background:url('bg.png');
+}
+.button-large{
+  padding-left: 10px;
+  padding-right:10px;
+  padding-top:4px;
+  padding-bottom:4px;
+}
+.button-larger{
+  padding-left: 10px;
+  padding-right:10px;
+  padding-top:7px;
+  padding-bottom:7px;
+  width: 100%;
+  font-size: 15px;
+}
+.span{
+  position: absolute;
+  left: 0;
+  top: 30px;
+  height: 100%;
+  width:200px;
+  z-index: 5;
+}
+.span-bg{
+  position: fixed;
+  left: 0;
+  top: 30px;
+  height: 100%;
+  width:200px;
+  background-color: #c5c5c5;
+  z-index: 3;
+}
+.banner{
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 30px;
+  width: 200px;
+  text-align: center;
+  font-size: 20px;
+  color: #fff;
+  background-color: #555555;
+  z-index: 10;
+}
+.notice{
+  position:fixed;top:0px;left:210px;width:400px;
+}
+.pull-right{
+  position: absolute;
+  right: 5px;
+}
+
+</style>
+</head>
+<body>
+  <div class="banner">ZJU校徽生成器</div>
+  <div class="span-bg"></div>
+  <div class="span">
+    <p>尺寸</p>
+    宽：<input type="text" id="width" value="590"size="10" onkeyup="changeAll();" />px<br/>
+    高：<input type="text" id="height" value="590"size="10"onkeyup="changeAll();"/>px<br/>
+  <p>颜色</p>
+  校徽颜色：<input type="checkbox" id="fbox" onchange="changeAll();" />透明
+  <form><input type="text" id="color1" name="color1" value="#024c8f" onkeyup="changeAll();" onchange="changeAll()" /></form>
+    <div id="colorpicker1" onmouseup="changeAll();"></div>
+    背景颜色：<input type="checkbox" id="bgbox" checked="yes"onchange="changeAll();"/>透明
+    <form><input type="text" id="color2" name="color2" value="#ffffff" onkeyup="changeAll();" onchange="changeAll()"/></form>
+    <div id="colorpicker2" onmouseup="changeAll();"></div>
+    <br/>
+  <button class="button-large" onclick="trans();">取反色</button>
+  <button class="button-large pull-right" onclick="document.location.reload();">重置</button>
+  <button class="button-larger" onclick="exportIt();">导出图片</button>
+  </div>
+
+  <div class="notice">
+    <p>注意：</p>
+    <ul>
+      <li>不支持IE8及其以下版本，请使用现代浏览器</li>
+      <li>原图来源于<a href="http://www.zju.edu.cn/c2021530/catalog.html"target="_blank">浙大官网的某个地方</a></li>
+      <li>自己基本滤掉了原图中的噪点，欢迎提供质量更高的图片，个人邮箱<a href="mailto:mBusyCoding@gmail.com?subject=#From ZJUChuang#" target="_blank">mBusyCoding@gmail.com</a></li>
+      <li>适合个人使用，请遵守相关法律法规balabala</li>
+        <li>左边是可以滚动的←_←</li>
+      <li>没了_(:3 」∠)_</li>
+      <p class="pull-right">By Trevor</p>
+    </ul>
+  </div>
+  <canvas id="myCanvas" width="590" height="590" style="display:none;">
+  Your browser does not support the canvas element.
+  </canvas>
+
+  <canvas id="mainCanvas" width="590" height="590">
+  Your browser does not support the canvas element.
+  </canvas>
+<script type="text/javascript">
+
+var c=document.getElementById("myCanvas");
+var mainCan=document.getElementById("mainCanvas");
+var cxt=c.getContext("2d");
+var main=mainCan.getContext("2d");
+var img=new Image();
+img.src="/07-1274169272-1445622.jpg";
+img.onload = function() {  
+  cxt.drawImage(img,0,0);
+  changeColor(2, 76, 143, 255);
+}
+function changeAll() {
+  var w = parseInt(document.getElementById('width').value);
+  var h = parseInt(document.getElementById('height').value);
+  document.getElementById('myCanvas').width = w;
+  document.getElementById('myCanvas').height = h;
+  document.getElementById('mainCanvas').width = w;
+  document.getElementById('mainCanvas').height = h;
+  cxt.drawImage(img,0,0,w,h);
+  changeFColor();
+}
+function trans(){
+  var imgData=main.getImageData(0,0,c.width,c.height);
+  // 反转颜色
+  for (var i=0;i<imgData.data.length;i+=4){
+      imgData.data[i]=255-imgData.data[i];
+      imgData.data[i+1]=255-imgData.data[i+1];
+      imgData.data[i+2]=255-imgData.data[i+2];
+      imgData.data[i+3]=255;
+    }
+    main.putImageData(imgData,0,0);
+}
+function changeFColor(){
+  var rgb1 = hex2rgb(document.getElementById('color1').value);
+  var rgb2 = hex2rgb(document.getElementById('color2').value);
+  var a1 = 255;
+  var a2 = 255;
+  if(document.getElementById('fbox').checked) a1 = 0;
+  if(document.getElementById('bgbox').checked) a2 = 0;
+  changeColor(rgb1[0], rgb1[1], rgb1[2], a1, rgb2[0], rgb2[1], rgb2[2],a2);
+}
+function changeColor(r1, g1, b1, a1, r2, g2, b2, a2){
+  var imgData=cxt.getImageData(0,0,c.width,c.height);
+  for (var i=0;i<imgData.data.length;i+=4){
+      if(imgData.data[i]+imgData.data[i+1]+imgData.data[i+2] < 540 && imgData.data[i+3] > 200){
+        imgData.data[i]=r1;
+        imgData.data[i+1]=g1;
+        imgData.data[i+2]=b1;
+        imgData.data[i+3]=a1;
+      }else{
+        imgData.data[i]=r2;
+        imgData.data[i+1]=g2;
+        imgData.data[i+2]=b2;
+        imgData.data[i+3]=a2;
+      }
+    }
+    main.putImageData(imgData,0,0);
+}
+function hex2rgb( $colour ) {
+  var rgb = new Array();
+    if ( $colour[0] == '#' ) {
+        $colour = $colour.substring(1);
+    }
+    if (  $colour.length == 6 ) {
+        $r = $colour[0] + $colour[1]; $g = $colour[2] + $colour[3]; $b = $colour[4] + $colour[5];    
+      $r = parseInt($r, 16);
+      $g = parseInt($g, 16);
+      $b = parseInt($b, 16);
+    } else if ( $colour.length == 3 ) {
+        $r = $colour[0]; $g = $colour[1]; $b = $colour[2];
+        $r = parseInt($r, 16)/16*255;
+      $g = parseInt($g, 16)/16*255;
+      $b = parseInt($b, 16)/16*255;
+    } else {
+        return false;
+    }
+    rgb[0] = $r;
+    rgb[1] = $g;
+    rgb[2] = $b
+    return rgb;
+}
+function exportIt(){
+  var imgURL = document.getElementById('mainCanvas').toDataURL('png');
+    var newHTML = '\
+    <!DOCTYPE html><html>\
+    <head>\
+    <title>导出图片</title>\
+    <meta charset="utf-8" />\
+    </head>\
+    <body>\
+      <p><b>请另存图片</b></p>\
+      <img src="' + imgURL + '" />\
+    </body>\
+    </html>';
+    var openWindow = window.open('',"smallwin","width=620,height=700");
+    openWindow.document.write(newHTML);
+}
+</script>
+<script type="text/javascript" src="http://libs.baidu.com/jquery/1.7.2/jquery.min.js"></script>
+<script type="text/javascript" src="farbtastic/farbtastic.js"></script>
+<script type="text/javascript">
+   $(document).ready(function() {
+     $('#colorpicker1').farbtastic('#color1');
+     $('#colorpicker2').farbtastic('#color2');
+   });
+ </script>
+</body>
